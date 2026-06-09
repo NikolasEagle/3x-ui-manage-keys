@@ -1,7 +1,8 @@
 import argparse
+from models import AuthInfo
 
 
-def extract_info_from_flags() -> dict:
+def extract_info_from_flags() -> AuthInfo:
     parser = argparse.ArgumentParser(
         add_help=False,
         formatter_class=lambda prog: argparse.HelpFormatter(
@@ -39,9 +40,6 @@ def extract_info_from_flags() -> dict:
     )
     args = parser.parse_args()
 
-    return {
-        "PANEL_URL": args.url,
-        "USERNAME": args.username,
-        "PASSWORD": args.password,
-        "ID": args.id,
-    }
+    return AuthInfo(
+        PANEL_URL=args.url, USERNAME=args.username, PASSWORD=args.password, ID=args.id
+    )
