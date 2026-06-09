@@ -1,0 +1,47 @@
+import argparse
+
+
+def extract_info_from_flags() -> dict:
+    parser = argparse.ArgumentParser(
+        add_help=False,
+        formatter_class=lambda prog: argparse.HelpFormatter(
+            prog, max_help_position=40, width=120
+        ),
+    )
+    parser.add_argument("-h", "--help", action="help", help="Show help information")
+    parser.add_argument(
+        "-u",
+        "--url",
+        type=str,
+        help="URL panel - http://<host>:<port>",
+        required=True,
+    )
+    parser.add_argument(
+        "-U",
+        "--username",
+        type=str,
+        help="Username",
+        required=True,
+    )
+    parser.add_argument(
+        "-p",
+        "--password",
+        type=str,
+        help="Password",
+        required=True,
+    )
+    parser.add_argument(
+        "-i",
+        "--id",
+        type=int,
+        help="Inbound ID",
+        required=True,
+    )
+    args = parser.parse_args()
+
+    return {
+        "PANEL_URL": args.url,
+        "USERNAME": args.username,
+        "PASSWORD": args.password,
+        "ID": args.id,
+    }
