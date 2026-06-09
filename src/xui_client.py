@@ -5,6 +5,7 @@ from pyxui_async import (
     InboundSettings,
     StreamSettings,
     XhttpSettings,
+    RealitySettings,
 )
 from pyxui_async.errors import BadLogin
 
@@ -58,7 +59,7 @@ async def get_clients(auth_info: AuthInfo) -> list[User] | None:
         streamSettings = inbound.streamSettings
 
         if not isinstance(streamSettings, StreamSettings):
-            print(f"❌ Error - Inbound {INBOUND_ID} have no xhttpSettings")
+            print(f"❌ Error - Inbound {INBOUND_ID} have no streamSettings")
             return
 
         xhttpSettings = streamSettings.xhttpSettings
@@ -69,7 +70,7 @@ async def get_clients(auth_info: AuthInfo) -> list[User] | None:
 
         realitySettings = streamSettings.realitySettings
 
-        if not isinstance(realitySettings, XhttpSettings):
+        if not isinstance(realitySettings, RealitySettings):
             print(f"❌ Error - Inbound {INBOUND_ID} have no realitySettings")
             return
 
