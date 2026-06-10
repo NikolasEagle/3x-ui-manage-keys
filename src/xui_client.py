@@ -80,7 +80,7 @@ async def get_clients(auth_info: AuthInfo) -> list[User] | None:
             print(f"❌ Error - Inbound {INBOUND_ID} have no clients")
             return
 
-        print(f"📋 Count clients into inbound {INBOUND_ID}: {len(clients)})")
+        print(f"📋 Count clients into inbound {INBOUND_ID}: {len(clients)}")
 
         users = []
 
