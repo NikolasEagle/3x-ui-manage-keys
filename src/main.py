@@ -1,9 +1,9 @@
-import asyncio
+import asyncio, sys
 
-from flags import extract_info_from_flags
-from xui_client import get_clients
-from keys import generate_keys
-from files import save_file_keys
+from .flags import extract_info_from_flags
+from .xui_client import get_clients
+from .keys import generate_keys
+from .files import save_file_keys
 
 
 async def main():
