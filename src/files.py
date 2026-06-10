@@ -1,5 +1,5 @@
 import aiofiles
-from models import AuthInfo
+from .models import AuthInfo
 
 
 async def save_file(filepath: str, filename: str, content: str) -> bool:

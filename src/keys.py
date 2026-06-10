@@ -1,4 +1,4 @@
-from models import User
+from .models import User
 
 
 def convert_slash(string: str) -> str:

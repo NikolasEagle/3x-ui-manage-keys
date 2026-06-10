@@ -1,4 +1,4 @@
-import asyncio, sys
+import asyncio
 
 from .flags import extract_info_from_flags
 from .xui_client import get_clients

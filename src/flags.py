@@ -1,5 +1,5 @@
 import argparse
-from models import AuthInfo
+from .models import AuthInfo
 
 
 def extract_info_from_flags() -> AuthInfo:

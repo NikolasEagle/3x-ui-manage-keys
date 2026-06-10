@@ -9,7 +9,7 @@ from pyxui_async import (
 )
 from pyxui_async.errors import BadLogin
 
-from models import AuthInfo, User
+from .models import AuthInfo, User
 
 
 async def check_auth(xui: XUI, username: str, password: str) -> bool:
