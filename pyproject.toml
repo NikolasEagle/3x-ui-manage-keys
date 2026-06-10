@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "3x-ui-manage-keys"
-version = "0.1.5"
+version = "0.1.6"
 description = "Manage users from 3x-ui panel"
 readme = "README.md"
 authors = [
@@ -64,8 +64,8 @@ dependencies = [
 ]
 
 [project.scripts]
-3x-ui-manage-keys = "src.main:main"
-3x-ui-keys = "src.main:main"
+3x-ui-manage-keys = "main:main"
+3x-ui-keys = "main:main"
 
 [project.urls]
 Homepage = "https://github.com/NikolasEagle/3x-ui-manage-keys"
