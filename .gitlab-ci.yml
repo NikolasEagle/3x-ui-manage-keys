@@ -1,0 +1,71 @@
+image: python:3.14
+
+stages:
+  - build
+  - publish
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - "src/**/*"
+        - "pyproject.toml"
+        - "requirements.txt"
+      when: always
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - ".github/**/*"
+        - ".gitignore"
+        - ".gitlab-ci.yml"
+        - "LICENSE"
+        - "README.md"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+    - when: never
+
+build:
+  stage: build
+  script:
+    - python --version
+    - pip install build
+    - python -m build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+
+publish_testpypi:
+  stage: publish
+  script:
+    - pip install twine
+    - twine check dist/*
+    - >
+      TWINE_PASSWORD=${TESTPYPI_TOKEN} 
+      twine upload 
+      --repository testpypi dist/* 
+      --username __token__ 
+      --non-interactive
+  needs:
+    - build
+
+publish_pypi:
+  stage: publish
+  script:
+    - pip install twine
+    - twine check dist/*
+    - >
+      TWINE_PASSWORD=${PYPI_TOKEN} 
+      twine upload dist/* 
+      --username __token__ 
+      --non-interactive
+  needs:
+    - build
