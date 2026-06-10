@@ -7,3 +7,4 @@ class AuthInfo:
     USERNAME: str
     PASSWORD: str
     ID: int
+    OUTPUT: str
