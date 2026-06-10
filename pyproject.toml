@@ -64,15 +64,18 @@ dependencies = [
 ]
 
 [project.scripts]
-3x-ui-manage-keys = "3x_ui_manage_keys.main:main"
-3x-ui-keys = "3x_ui_manage_keys.main:main"
+3x-ui-manage-keys = "main:main"
+3x-ui-keys = "main:main"
 
 [project.urls]
 Homepage = "https://github.com/NikolasEagle/3x-ui-manage-keys"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["*"]
+include = ["3x_ui_manage_keys*"]
 exclude = ["venv*", "__pycache__*"]
 
 [tool.setuptools.package-data]
