@@ -4,8 +4,10 @@ aiohttp==3.14.1
 aiohttp_socks==0.11.0
 aiosignal==1.4.0
 annotated-types==0.7.0
+atomicwrites==1.4.1
 attrs==26.1.0
 build==1.5.0
+cachetools==5.5.2
 certifi==2026.5.20
 cffi==2.0.0
 charset-normalizer==3.4.7
@@ -32,6 +34,7 @@ more-itertools==11.1.0
 multidict==6.7.1
 nh3==0.3.5
 packaging==26.2
+peewee==3.19.0
 propcache==0.5.2
 pycparser==3.0
 pycryptodome==3.23.0
@@ -40,6 +43,7 @@ pydantic_core==2.46.4
 Pygments==2.20.0
 pyOpenSSL==26.2.0
 pyproject_hooks==1.2.0
+python-olm==3.2.16
 python-socks==2.8.1
 pyxui_async==3.0.1
 readme_renderer==45.0
