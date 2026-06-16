@@ -8,9 +8,10 @@ from nio import (
     RoomCreateError,
     RoomSendError,
     RoomSendResponse,
+    UploadError,
 )
 
-import logging
+import logging, aiofiles, os, magic, io
 
 logging.getLogger("nio.crypto").setLevel(logging.CRITICAL)
 
@@ -64,24 +65,15 @@ async def get_or_create_room(client: AsyncClient, target_user: str) -> str | Non
 
 
 async def send_message(
-    client: AsyncClient, target_user: str, text: str
+    client: AsyncClient, room_id: str, target_user: str, message: str
 ) -> RoomSendResponse | None:
-    room_id = await get_or_create_room(client, target_user)
-
-    if room_id is None:
-        return
-
-    sync_response = await client.sync(timeout=1000)
-    if isinstance(sync_response, SyncError):
-        print(f"❌ Error - Sync failed: {sync_response.message}")
-        return
 
     response = await client.room_send(
         room_id=room_id,
         message_type="m.room.message",
         content={
             "msgtype": "m.text",
-            "body": text,
+            "body": message,
         },
         ignore_unverified_devices=True,
     )
@@ -95,13 +87,73 @@ async def send_message(
     return response
 
 
-async def sendKey(
+async def send_file(
+    client: AsyncClient,
+    room_id: str,
+    target_user: str,
+    file_path: str,
+) -> RoomSendResponse | None:
+
+    try:
+        mime_type = magic.from_file(file_path, mime=True)
+        filename = os.path.basename(file_path)
+        filesize = os.path.getsize(file_path)
+
+        async with aiofiles.open(file_path, "rb") as f:
+            file_data = await f.read()
+
+        file_obj = io.BytesIO(file_data)
+
+        upload_response, _ = await client.upload(
+            data_provider=file_obj,
+            content_type=mime_type,
+            filename=filename,
+            filesize=filesize,
+        )
+
+        if isinstance(upload_response, UploadError):
+            print("❌ Error - File upload failed")
+            return
+
+        content = {
+            "body": filename,
+            "msgtype": "m.file",
+            "filename": filename,
+            "url": upload_response.content_uri,
+        }
+
+        response = await client.room_send(
+            room_id=room_id,
+            message_type="m.room.message",
+            content=content,
+            ignore_unverified_devices=True,
+        )
+
+        if isinstance(response, RoomSendError):
+            print(f"❌ Error - Sending file")
+            return
+
+        print(f"✅ File to user {target_user} was send succesfull")
+
+        return response
+
+    except PermissionError:
+        print(f"❌ Error - No permissions for writing")
+    except OSError as err:
+        print(f"❌ Error - OS error: {err}")
+    except Exception as err:
+        print(f"❌ Error - {err}")
+    return
+
+
+async def send_key(
     homeserver: str,
     bot_id: str,
     password: str,
     target_user: str,
     message: str,
     matrix_store: str,
+    file_path: str,
 ) -> bool | None:
     сonfig = AsyncClientConfig(
         max_limit_exceeded=0,
@@ -125,10 +177,30 @@ async def sendKey(
 
     print("✅ Login successful")
 
-    result = await send_message(client, target_user, message)
+    room_id = await get_or_create_room(client, target_user)
 
-    if result is None:
-        print("❌ Error - Message sending failed")
+    if room_id is None:
+        return
+
+    sync_response = await client.sync(timeout=1000)
+    if isinstance(sync_response, SyncError):
+        print(f"❌ Error - Sync failed: {sync_response.message}")
+        return
+
+    result_message = await send_message(
+        client=client, room_id=room_id, target_user=target_user, message=message
+    )
+
+    if result_message is None:
+        await client.logout()
+        await client.close()
+        return
+
+    result_file = await send_file(
+        client=client, room_id=room_id, target_user=target_user, file_path=file_path
+    )
+
+    if result_file is None:
         await client.logout()
         await client.close()
         return
