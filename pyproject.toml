@@ -57,6 +57,7 @@ dependencies = [
     "python-magic==0.4.27",
     "python-olm==3.2.16",
     "pyxui_async>=3.0.1",
+    "PyYAML==6.0.3",
     "readme_renderer>=45.0",
     "requests>=2.34.2",
     "requests-toolbelt>=1.0.0",
