@@ -9,8 +9,7 @@ from pyxui_async import (
 )
 from pyxui_async.errors import BadLogin
 
-from .models import AuthInfo, User
-
+from .models import AuthInfo, Key
 
 async def check_auth(xui: XUI, username: str, password: str) -> bool:
     try:
@@ -25,7 +24,7 @@ async def check_auth(xui: XUI, username: str, password: str) -> bool:
         return False
 
 
-async def get_clients(auth_info: AuthInfo) -> list[User] | None:
+async def get_clients_keys(auth_info: AuthInfo) -> list[Key] | None:
     PANEL_URL = auth_info.PANEL_URL
     USERNAME = auth_info.USERNAME
     PASSWORD = auth_info.PASSWORD
@@ -82,20 +81,23 @@ async def get_clients(auth_info: AuthInfo) -> list[User] | None:
 
         print(f"📋 Count clients into inbound {INBOUND_ID}: {len(clients)}")
 
-        users = []
+        keys = []
 
         for client in clients:
+
             if (
                 client.id is None
                 or settings.encryption is None
                 or xhttpSettings.path is None
                 or xhttpSettings.host is None
                 or xhttpSettings.mode is None
+                or inbound.remark is None
             ):
                 print(f"❌ Error - Client have no data for generating key")
                 return
-            users.append(
-                User(
+
+            keys.append(
+                Key(
                     protocol=inbound.protocol,
                     id=client.id,
                     server=PANEL_URL.replace("https://", "").split("/")[0],
@@ -117,6 +119,6 @@ async def get_clients(auth_info: AuthInfo) -> list[User] | None:
                 )
             )
 
-        return users
+        return keys
     else:
         return
