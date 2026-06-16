@@ -11,6 +11,7 @@ from pyxui_async.errors import BadLogin
 
 from .models import AuthInfo, Key
 
+
 async def check_auth(xui: XUI, username: str, password: str) -> bool:
     try:
         await xui.login(username, password)
@@ -100,7 +101,11 @@ async def get_clients_keys(auth_info: AuthInfo) -> list[Key] | None:
                 Key(
                     protocol=inbound.protocol,
                     id=client.id,
-                    server=PANEL_URL.replace("https://", "").split("/")[0],
+                    server=(
+                        PANEL_URL.replace("https://", "").split("/")[0]
+                        if "https://" in PANEL_URL
+                        else PANEL_URL.replace("http://", "")
+                    ),
                     port=inbound.port,
                     transport=streamSettings.network,
                     encryption=settings.encryption,
