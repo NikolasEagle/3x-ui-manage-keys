@@ -3,7 +3,7 @@ import asyncio, sys
 from .flags import extract_info_from_flags
 from .xui_client import get_clients_keys
 from .keys import generate_keys
-from .files import save_file_keys
+from .files import save_file_keys, distribute_keys
 from .config import read_config
 
 
@@ -16,8 +16,11 @@ async def async_main():
     if not clients_keys:
         return
     keys = generate_keys(clients_keys)
-    success = await save_file_keys(auth_info=auth_info, keys=keys)
-    if not success:
+    success_save_keys = await save_file_keys(auth_info=auth_info, keys=keys)
+    if not success_save_keys:
+        return
+    users = await distribute_keys(auth_info, config, clients_keys)
+    if users is None:
         return
 
 def main():
