@@ -1,4 +1,4 @@
-from .models import User
+from .models import Key
 
 
 def convert_slash(string: str) -> str:
@@ -8,7 +8,7 @@ def convert_slash(string: str) -> str:
     return string
 
 
-def generate_keys(users: list[User]) -> list[str]:
+def generate_keys(users: list[Key]) -> list[str]:
     keys = []
     for user in users:
         key = (
