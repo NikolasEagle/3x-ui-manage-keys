@@ -27,4 +27,4 @@ class Key:
 class User:
     username: str
     prefix: str
-    keys: list[Key]
+    keys: list[str]
