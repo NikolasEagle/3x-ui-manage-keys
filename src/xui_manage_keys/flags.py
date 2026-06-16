@@ -42,7 +42,14 @@ def extract_info_from_flags() -> AuthInfo:
         "-o",
         "--output",
         type=str,
-        help="Outut directory to save keys",
+        help="Output directory to save keys",
+        required=True,
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        help="Matrix config for sending keys",
         required=True,
     )
     args = parser.parse_args()
@@ -53,4 +60,5 @@ def extract_info_from_flags() -> AuthInfo:
         PASSWORD=args.password,
         ID=args.id,
         OUTPUT=args.output,
+        CONFIG=args.config,
     )

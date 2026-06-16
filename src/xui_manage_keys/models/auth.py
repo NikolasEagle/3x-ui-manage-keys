@@ -8,3 +8,4 @@ class AuthInfo:
     PASSWORD: str
     ID: int
     OUTPUT: str
+    CONFIG: str
