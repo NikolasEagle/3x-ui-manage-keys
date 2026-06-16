@@ -15,6 +15,8 @@ from .models import User, MatrixConfig
 
 import logging, aiofiles, os, magic, io
 
+from nio.crypto.attachments import encrypt_attachment
+
 logging.getLogger("nio.crypto").setLevel(logging.CRITICAL)
 
 
@@ -104,24 +106,46 @@ async def send_file(
         async with aiofiles.open(file_path, "rb") as f:
             file_data = await f.read()
 
-        file_obj = io.BytesIO(file_data)
+        encrypted_data = b""
+        encryption_info = None
+
+        for value in encrypt_attachment(file_data):
+            if isinstance(value, bytes):
+                encrypted_data += value
+            else:
+                encryption_info = value
+
+        if encryption_info is None:
+            print("❌ Error - Encryption failed")
+            return
 
         upload_response, _ = await client.upload(
-            data_provider=file_obj,
-            content_type=mime_type,
+            data_provider=io.BytesIO(encrypted_data),
+            content_type="application/octet-stream",
             filename=filename,
-            filesize=filesize,
+            filesize=len(encrypted_data),
         )
 
         if isinstance(upload_response, UploadError):
             print("❌ Error - File upload failed")
             return
 
+        if type(encryption_info) != dict:
+            print("❌ Error - Encryption info is not a dict")
+            return
+
         content = {
             "body": filename,
             "msgtype": "m.file",
             "filename": filename,
-            "url": upload_response.content_uri,
+            "info": {
+                "size": filesize,
+                "mimetype": mime_type,
+            },
+            "file": {
+                "url": upload_response.content_uri,
+                **encryption_info,
+            },
         }
 
         response = await client.room_send(
@@ -196,10 +220,7 @@ async def send_files(
     BOT_ID = matrix_config.bot_id
     BOT_PASSWORD = matrix_config.bot_password
     MATRIX_STORE = matrix_config.matrix_store
-    MESSAGE = f"""
-        Привет! Я {BOT_ID} - помощник по выдаче сертификатов для VPN.
-        Вот твои сертификаты:
-    """
+    MESSAGE = f"""Привет! Я {BOT_ID} - помощник по выдаче сертификатов для VPN.\nВот твои сертификаты:"""
 
     сonfig = AsyncClientConfig(
         max_limit_exceeded=0,
