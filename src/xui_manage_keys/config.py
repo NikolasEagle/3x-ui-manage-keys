@@ -1,5 +1,5 @@
 import os, yaml
-from .models import AuthInfo, MatrixConfig
+from .models import AuthInfo, MatrixConfig, MatrixUser, Remark
 
 
 def read_config(auth_info: AuthInfo) -> MatrixConfig | None:
@@ -13,6 +13,12 @@ def read_config(auth_info: AuthInfo) -> MatrixConfig | None:
             if data is None:
                 print(f"❌ Error - File {config} is empty")
                 return
+            remarks = data["remarks"]
+            for remark in remarks:
+                remarks[remark] = Remark(**remarks[remark])
+                users = remarks[remark].users
+                for i in range(len(users)):
+                    users[i] = MatrixUser(**users[i])
             return MatrixConfig(**data)
     except yaml.YAMLError as err:
         print(f"❌ Error - Parsing YAML: {err}")
