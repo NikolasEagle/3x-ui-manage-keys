@@ -11,6 +11,8 @@ from nio import (
     UploadError,
 )
 
+from .models import User, MatrixConfig
+
 import logging, aiofiles, os, magic, io
 
 logging.getLogger("nio.crypto").setLevel(logging.CRITICAL)
@@ -146,15 +148,59 @@ async def send_file(
     return
 
 
-async def send_key(
-    homeserver: str,
-    bot_id: str,
-    password: str,
-    target_user: str,
-    message: str,
-    matrix_store: str,
-    file_path: str,
+async def send_keys(
+    client: AsyncClient, identity_server: str, users: list[User], message: str
 ) -> bool | None:
+    for user in users:
+
+        target_user = f"@{user.username}:{identity_server}"
+
+        room_id = await get_or_create_room(client, target_user)
+
+        if room_id is None:
+            return
+
+        sync_response = await client.sync(timeout=1000)
+        if isinstance(sync_response, SyncError):
+            print(f"❌ Error - Sync failed: {sync_response.message}")
+            return
+
+        keys = user.keys
+
+        result_message = await send_message(
+            client=client, room_id=room_id, target_user=target_user, message=message
+        )
+
+        if result_message is None:
+            return
+
+        for key in keys:
+
+            result_file = await send_file(
+                client=client,
+                room_id=room_id,
+                target_user=target_user,
+                file_path=key,
+            )
+
+            if result_file is None:
+                return
+
+
+async def send_files(
+    matrix_config: MatrixConfig,
+    users: list[User],
+) -> bool | None:
+    HOMESERVER = matrix_config.homeserver
+    IDENTITY_SERVER = matrix_config.identity_server
+    BOT_ID = matrix_config.bot_id
+    BOT_PASSWORD = matrix_config.bot_password
+    MATRIX_STORE = matrix_config.matrix_store
+    MESSAGE = f"""
+        Привет! Я {BOT_ID} - помощник по выдаче сертификатов для VPN.
+        Вот твои сертификаты:
+    """
+
     сonfig = AsyncClientConfig(
         max_limit_exceeded=0,
         max_timeouts=0,
@@ -162,13 +208,13 @@ async def send_key(
         encryption_enabled=True,
     )
     client = AsyncClient(
-        homeserver=homeserver,
-        user=bot_id,
-        store_path=matrix_store,
+        homeserver=HOMESERVER,
+        user=f"@{BOT_ID}:{IDENTITY_SERVER}",
+        store_path=MATRIX_STORE,
         config=сonfig,
     )
 
-    response = await client.login(password)
+    response = await client.login(BOT_PASSWORD)
 
     if isinstance(response, LoginError):
         print(f"❌ Error - Login failed: {response.message}")
@@ -177,30 +223,11 @@ async def send_key(
 
     print("✅ Login successful")
 
-    room_id = await get_or_create_room(client, target_user)
-
-    if room_id is None:
-        return
-
-    sync_response = await client.sync(timeout=1000)
-    if isinstance(sync_response, SyncError):
-        print(f"❌ Error - Sync failed: {sync_response.message}")
-        return
-
-    result_message = await send_message(
-        client=client, room_id=room_id, target_user=target_user, message=message
+    success = await send_keys(
+        client=client, identity_server=IDENTITY_SERVER, users=users, message=MESSAGE
     )
 
-    if result_message is None:
-        await client.logout()
-        await client.close()
-        return
-
-    result_file = await send_file(
-        client=client, room_id=room_id, target_user=target_user, file_path=file_path
-    )
-
-    if result_file is None:
+    if success is None:
         await client.logout()
         await client.close()
         return

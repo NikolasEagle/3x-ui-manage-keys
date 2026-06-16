@@ -4,6 +4,7 @@ from .keys import generate_keys
 from .files import save_file_keys, distribute_keys
 from .flags import extract_info_from_flags
 from .config import read_config
+from .messages import send_files
 
 __all__ = [
     "main",
@@ -13,4 +14,5 @@ __all__ = [
     "distribute_keys",
     "extract_info_from_flags",
     "read_config",
+    "send_files"
 ]
