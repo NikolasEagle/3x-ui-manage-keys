@@ -3,6 +3,7 @@ from .xui_client import get_clients
 from .keys import generate_keys
 from .files import save_file_keys
 from .flags import extract_info_from_flags
+from .config import read_config
 
 __all__ = [
     "main",
@@ -10,4 +11,5 @@ __all__ = [
     "generate_keys",
     "save_file_keys",
     "extract_info_from_flags",
+    "read_config",
 ]
