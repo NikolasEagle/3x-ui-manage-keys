@@ -26,4 +26,5 @@ class Key:
 @dataclass
 class User:
     username: str
+    prefix: str
     keys: list[Key]
