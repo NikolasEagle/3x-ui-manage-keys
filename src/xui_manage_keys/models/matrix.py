@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class MatrixUser:
-    username: str
+    name: str
     prefix: str
 
 
@@ -14,9 +14,9 @@ class Remark:
 
 @dataclass
 class MatrixConfig:
-    HOMESERVER: str
-    IDENTITY_SERVER: str
-    BOT_ID: str
-    BOT_PASSWORD: str
-    MATRIX_STORE: str
-    REMARKS: list[Remark]
+    homeserver: str
+    identity_server: str
+    bot_id: str
+    bot_password: str
+    matrix_store: str
+    remarks: list[Remark]
