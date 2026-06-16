@@ -13,7 +13,7 @@ def read_config(auth_info: AuthInfo) -> MatrixConfig | None:
             if data is None:
                 print(f"❌ Error - File {config} is empty")
                 return
-            return data
+            return MatrixConfig(**data)
     except yaml.YAMLError as err:
         print(f"❌ Error - Parsing YAML: {err}")
     except PermissionError:
