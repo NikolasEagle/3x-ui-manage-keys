@@ -19,4 +19,4 @@ class MatrixConfig:
     bot_id: str
     bot_password: str
     matrix_store: str
-    remarks: list[Remark]
+    remarks: dict[str, Remark]

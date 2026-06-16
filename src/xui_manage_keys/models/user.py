@@ -2,6 +2,12 @@ from dataclasses import dataclass
 
 
 @dataclass
+class MatrixData:
+    matrix_username: str
+    keys: list[str]
+
+
+@dataclass
 class User:
     protocol: str
     id: str
@@ -21,3 +27,4 @@ class User:
     pqv: str
     remark: str
     email: str
+    matrix_data: MatrixData | None
